@@ -6,10 +6,10 @@ export const getProducts = async (id) => {
   const productId = id
   
   if (productId === undefined) {
-    return await Product.find()
+    return await Product.find().populate('category')
   }
 
-  const filteredProduct = await Product.findById(productId);
+  const filteredProduct = await Product.findById(productId).populate('category');
 
   if (filteredProduct) {
     return filteredProduct
@@ -22,18 +22,20 @@ export const getProducts = async (id) => {
 
 // POST /products
 export const createProduct = async (productDetails) => {
-  const { name, price } = productDetails;
+  const { name, price, category } = productDetails;
 
   if(
     typeof name !== 'string' ||
-    typeof price !== 'number'
+    typeof price !== 'number' ||
+    typeof category !== 'string'
   ) {
     throw new AppError('Invalid data', 400)
   }
 
   const newProduct = await Product.create({
     name,
-    price
+    price,
+    category
   });
 
   console.log(newProduct);

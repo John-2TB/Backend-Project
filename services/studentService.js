@@ -4,12 +4,13 @@ import { AppError } from '../errors/AppError.js';
 
 // POST /student
 export const createStudent = async (studentData) => {
-  const { id, name, age } = studentData;
+  const { id, name, age, class: studentClass } = studentData;
 
   const newStudent = await Student.create({
     id,
     name,
-    age
+    age,
+    class: studentClass
   });
 
   console.log(newStudent);
@@ -55,10 +56,10 @@ export const getStudent = async (id) => {
   const studentId = id;
 
   if (studentId === undefined) {
-    return await Student.find();
+    return await Student.find().populate('class');
   }
 
-  const filteredStudent = await Student.findOne({id: Number(studentId)});
+  const filteredStudent = await Student.findOne({id: Number(studentId)}).populate('class');
 
 
   if (!filteredStudent) {

@@ -1,4 +1,3 @@
-import { Product } from "../models/productModel.js";
 import { createProduct, deleteProduct, getProducts, updateProduct } from "../services/productService.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
