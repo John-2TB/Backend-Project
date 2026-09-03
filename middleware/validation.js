@@ -1,3 +1,6 @@
+import mongoose from "mongoose";
+import { Class } from "../models/classModel.js";
+import { Subject } from "../models/subjectModel.js";
 
 export const validatesStudent = (options) => {
   return (req, res, next) => {
@@ -36,8 +39,19 @@ export const validatesStudent = (options) => {
       })
     }
 
+    // Checks if class is a valid ObjectId
+    if (!mongoose.isValidObjectId(studentClass)) {
+      return res.status(400).json({
+        message: 'Invalid student class data'
+      });
+    }
+
     // Checks if subjects array contains only strings
-    if (subjects.some(subject => typeof subject !== 'string')) {
+    if (
+      subjects.some(subject => 
+        (typeof subject !== 'string') || (!mongoose.isValidObjectId(subject))
+      )
+    ) {
 
       return res.status(400).json({
         message: 'Invalid student subjects data'
@@ -91,6 +105,19 @@ export const validatesStudent = (options) => {
       return res.status(400).json({
         message: 'Invalid student subjects data'
      });
+    }
+
+    // Checks if class is a valid ObjectId
+    if (!mongoose.isValidObjectId(studentClass)) {
+      return res.status(400).json({
+        message: 'Invalid student class data'
+      });
+    }
+
+    if (!mongoose.isValidObjectId(subjects)) {
+      return res.status(400).json({
+        message: 'Invalid student subject data'
+      });
     }
 
   }

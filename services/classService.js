@@ -21,7 +21,10 @@ export const createClass = async (className) => {
 
 // Get students by their class
 export const getStudentByClass = async (classId) => {
-  if (typeof classId !== 'string' || classId.trim() === '') {
+  if (typeof classId !== 'string' ||
+    classId.trim() === '' ||
+    !mongoose.isValidObjectId(classId)
+  ) {
     throw new AppError('Invalid data type', 400);
   }
 

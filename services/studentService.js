@@ -1,10 +1,33 @@
 import { Student } from "../models/studentModel.js";
 import { AppError } from '../errors/AppError.js';
+import { Subject } from "../models/subjectModel.js";
+import { Class } from "../models/classModel.js";
 
 
 // POST /student
 export const createStudent = async (studentData) => {
   const { id, name, age, class: studentClass, subjects } = studentData;
+
+
+  // Check if the class exists
+  const existingClass = await Class.findById(studentClass);
+
+  if (!existingClass) {
+    throw new AppError('Class not found', 404);
+  }
+
+
+  // Checks if subject IDs exist
+  if (subjects && subjects.length > 0) {
+    const existingSubjects = await Subject.find({
+      _id: { $in: subjects }
+    })
+
+    if (existingSubjects.length !== subjects.length) {
+      throw new AppError('One or more subjects not found', 404);
+    }
+  }
+
 
   const newStudent = await Student.create({
     id,
@@ -32,16 +55,38 @@ export const updateStudent = async (studentID, studentDetails) => {
     (studentClass !== undefined && typeof studentClass !== 'string') ||
     (subjects !== undefined && !Array.isArray(subjects))
   ) {
-    throw new AppError('Invalid data', 400)
+    throw new AppError('Invalid student data', 400)
   };
 
-  // Checks if subjects array contains only strings
-  if (subjects !== undefined && subjects.some(subject => typeof subject !== 'string')) {
+  // Check if the class exists
+  if (studentClass !== undefined) {
+    const existingClass = await Class.findById(studentClass);
 
-    return res.status(400).json({
-      message: 'Invalid student subjects data'
-    });
+    if (!existingClass) {
+      throw new AppError('Class not found', 404);
+    }
   }
+
+
+  // Checks if subject IDs exist
+  if(subjects !== undefined && subjects.length > 0) {
+
+
+    const existingSubjects = await Subject.find({
+      _id: { $in: subjects }
+    })
+
+    if (existingSubjects.length !== subjects.length) {
+      throw new AppError('One or more subjects not found', 404);
+    }
+
+  }
+
+  // Ensures that subjects doesn't reset the subjects array to an empty array if not provided in the request body
+  if (subjects !== undefined && subjects.length === 0) {
+    throw new AppError('Subjects cannot be empty', 400);
+  }
+  
 
   const updateData = {
     ...(name !== undefined && { name }),
@@ -49,6 +94,11 @@ export const updateStudent = async (studentID, studentDetails) => {
     ...(studentClass !== undefined && { class: studentClass }),
     ...(subjects !== undefined && { subjects })
   };
+
+  // Check if updateData is empty
+  if (Object.keys(updateData).length === 0) {
+    throw new AppError('No valid fields provided for update', 400);
+  }
 
   const updatedStudent = await Student.findOneAndUpdate(
     { id: studentId },
