@@ -1,9 +1,8 @@
 import 'dotenv/config';
 import express from 'express';
 import studentRoutes from './routes/studentRoutes.js';
-import productRoutes from './routes/productRoutes.js';
-import categoryRoutes from './routes/categoryRoutes.js';
 import classRoutes from './routes/classRoutes.js';
+import subjectRoutes from './routes/subjectRoutes.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { connectDB } from './config/db.js';
 
@@ -14,9 +13,8 @@ const port = 3000;
 app.use(express.json());
 
 app.use('/students', studentRoutes);
-app.use('/products', productRoutes);
-app.use('/categories', categoryRoutes);
 app.use('/classes', classRoutes);
+app.use('/subjects', subjectRoutes)
 
 
 app.get('/', (req, res) => {

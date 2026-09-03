@@ -1,7 +1,7 @@
 
 export const validatesStudent = (options) => {
   return (req, res, next) => {
-  const { id, name, age, class: studentClass } = req.body;
+  const { id, name, age, class: studentClass, subjects } = req.body;
 
   // ============================ 
   // POST validation 
@@ -14,10 +14,11 @@ export const validatesStudent = (options) => {
       id === undefined ||
       name === undefined ||
       age === undefined ||
-      studentClass === undefined
+      studentClass === undefined ||
+      subjects === undefined
     ) {
       return res.status(400).json({
-        message: 'id, name, age and class are required'
+        message: 'id, name, age, class and subjects are required'
       });
     }
 
@@ -27,11 +28,20 @@ export const validatesStudent = (options) => {
       typeof id !== 'number' ||
       typeof name !== 'string' ||
       typeof age !== 'number' ||
-      typeof studentClass !== 'string'
+      typeof studentClass !== 'string' ||
+      !Array.isArray(subjects)
     ) {
       return res.status(400).json({
         message: 'Invalid student data'
       })
+    }
+
+    // Checks if subjects array contains only strings
+    if (subjects.some(subject => typeof subject !== 'string')) {
+
+      return res.status(400).json({
+        message: 'Invalid student subjects data'
+     });
     }
 
     // Checks value
@@ -58,7 +68,8 @@ export const validatesStudent = (options) => {
       id !== undefined ||
       (name !== undefined && typeof name !== 'string') ||
       (age !== undefined && typeof age !== 'number') ||
-      (studentClass !== undefined && typeof studentClass !== 'string')
+      (studentClass !== undefined && typeof studentClass !== 'string') ||
+      (subjects !== undefined && !Array.isArray(subjects))
     ) {
       return res.status(400).json({
         message: 'Invalid student data'
@@ -74,6 +85,12 @@ export const validatesStudent = (options) => {
       return res.status(400).json({
         message: 'Invalid student data'
       })
+    }
+
+    if (subjects !== undefined && subjects.some(subject => typeof subject !== 'string')) {
+      return res.status(400).json({
+        message: 'Invalid student subjects data'
+     });
     }
 
   }

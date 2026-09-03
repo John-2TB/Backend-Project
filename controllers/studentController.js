@@ -1,4 +1,3 @@
-import { Student } from '../models/studentModel.js';
 import { createStudent, deleteStudent, getStudent, updateStudent } from '../services/studentService.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 

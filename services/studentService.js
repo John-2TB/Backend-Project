@@ -4,13 +4,14 @@ import { AppError } from '../errors/AppError.js';
 
 // POST /student
 export const createStudent = async (studentData) => {
-  const { id, name, age, class: studentClass } = studentData;
+  const { id, name, age, class: studentClass, subjects } = studentData;
 
   const newStudent = await Student.create({
     id,
     name,
     age,
-    class: studentClass
+    class: studentClass,
+    subjects
   });
 
   console.log(newStudent);
@@ -23,18 +24,30 @@ export const createStudent = async (studentData) => {
 export const updateStudent = async (studentID, studentDetails) => {
   const studentId = Number(studentID);
 
-  const { name, age } = studentDetails;
+  const { name, age, class: studentClass, subjects } = studentDetails;
 
   if(
     (name !== undefined && typeof name !== 'string') ||
-    (age !== undefined && typeof age !== 'number')
+    (age !== undefined && typeof age !== 'number') ||
+    (studentClass !== undefined && typeof studentClass !== 'string') ||
+    (subjects !== undefined && !Array.isArray(subjects))
   ) {
     throw new AppError('Invalid data', 400)
   };
 
+  // Checks if subjects array contains only strings
+  if (subjects !== undefined && subjects.some(subject => typeof subject !== 'string')) {
+
+    return res.status(400).json({
+      message: 'Invalid student subjects data'
+    });
+  }
+
   const updateData = {
     ...(name !== undefined && { name }),
-    ...(age !== undefined && { age })
+    ...(age !== undefined && { age }),
+    ...(studentClass !== undefined && { class: studentClass }),
+    ...(subjects !== undefined && { subjects })
   };
 
   const updatedStudent = await Student.findOneAndUpdate(
@@ -56,10 +69,10 @@ export const getStudent = async (id) => {
   const studentId = id;
 
   if (studentId === undefined) {
-    return await Student.find().populate('class');
+    return await Student.find().populate(['class', 'subjects']);
   }
 
-  const filteredStudent = await Student.findOne({id: Number(studentId)}).populate('class');
+  const filteredStudent = await Student.findOne({id: Number(studentId)}).populate(['class', 'subjects']);
 
 
   if (!filteredStudent) {

@@ -1,4 +1,4 @@
-import { createClass } from "../services/classService.js";
+import { createClass, getStudentByClass } from "../services/classService.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
 
@@ -13,3 +13,15 @@ export const createClassController = asyncHandler(
     });
   }
 );
+
+// GET students in /class
+export const getStudentByClassController = asyncHandler(
+  async (req, res) => {
+    const students = await getStudentByClass(req.params.classId);
+
+    res.status(200).json({
+      message: 'Students found',
+      data: students
+    })
+  }
+)

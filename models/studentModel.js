@@ -22,7 +22,12 @@ const studentSchema = new mongoose.Schema({
   class: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Class'
-  }
+  },
+
+  subjects: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Subject'
+  }]
 });
 
 export const Student = mongoose.model('Student', studentSchema);

@@ -1,9 +1,12 @@
 import express from 'express';
-import { createClassController } from '../controllers/classController.js';
+import { createClassController, getStudentByClassController } from '../controllers/classController.js';
 
 const router = express.Router();
 
-// POST /category
+// POST /class
 router.post('/', createClassController);
+
+// GET students by /class
+router.get('/:classId/students', getStudentByClassController);
 
 export default router;
