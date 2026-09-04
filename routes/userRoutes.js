@@ -1,6 +1,6 @@
 import express from 'express';
 import { validateUser } from '../middleware/validation.js';
-import { createUserController } from '../controllers/userController.js';
+import { createUserController, userLoginController } from '../controllers/userController.js';
 
 const router = express.Router();
 
@@ -9,6 +9,11 @@ const router = express.Router();
 // POST
 // ====================================
 router.post('/', validateUser(), createUserController);
+
+// ====================================
+// POST for login
+// ====================================
+router.post('/login', userLoginController);
 
 
 export default router;

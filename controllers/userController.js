@@ -1,5 +1,5 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { createUser } from "../services/userService.js";
+import { createUser, loginUser } from "../services/userService.js";
 
 // Create new user
 export const createUserController = asyncHandler (
@@ -10,5 +10,18 @@ export const createUserController = asyncHandler (
       message: 'User created successfully',
       data: newUser
     });
+  }
+);
+
+
+// Login user
+export const userLoginController = asyncHandler(
+  async (req, res) => {
+    const existingUser = await loginUser(req.body);
+
+    res.status(200).json({
+      message: 'User login successfull',
+      data: existingUser
+    })
   }
 );

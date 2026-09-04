@@ -3,6 +3,7 @@ import { User } from "../models/userModel.js";
 import { Teacher } from '../models/teacherModel.js';
 import { AppError } from "../errors/AppError.js";
 import { Student } from "../models/studentModel.js";
+import mongoose from 'mongoose';
 
 
 // Create user
@@ -35,7 +36,7 @@ export const createUser = async (userData) => {
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  const newUser = await User.create({
+  await User.create({
     registrationNumber,
     email,
     password: hashedPassword,
@@ -51,5 +52,76 @@ export const createUser = async (userData) => {
     student,
     teacher
   };
+
+};
+
+
+// LOGIN user
+export const loginUser = async (loginData) => {
+  const {
+    registrationNumber,
+    email,
+    password,
+    role
+  } = loginData;
+
+  if (
+    (role === 'teacher' || role === 'admin') &&
+    registrationNumber !== undefined
+  ) {
+    throw new AppError('Invalid credentials', 400);
+  }
+
+  const validRole = ['student', 'teacher', 'admin']
+
+  if (!validRole.includes(role)) {
+    throw new AppError('Invalid role', 400);
+  }
+
+  // For student user
+  if (role === 'student') {
+    const existingUser = await User.findOne({
+      registrationNumber: registrationNumber,
+      role: role
+    });
+
+    if (!existingUser) {
+      throw new AppError('No user found', 404);
+    }
+
+    const correctPassword = await bcrypt.compare(password, existingUser.password);
+
+    if (!correctPassword) {
+      throw new AppError('Incorrect password', 400)
+    }
+
+    return {
+      registrationNumber,
+      role
+    };
+  }
+
+  // For teacher and admin user
+  if (role === 'teacher' || role === 'admin') {
+    const existingUser = await User.findOne({
+      email: email,
+      role: role
+    });
+
+    if (!existingUser) {
+      throw new AppError('No user found', 404);
+    }
+
+    const correctPassword = await bcrypt.compare(password, existingUser.password);
+
+    if (!correctPassword) {
+      throw new AppError('Incorrect password', 400)
+    }
+
+    return {
+      email,
+      role
+    };
+  }
 
 };
