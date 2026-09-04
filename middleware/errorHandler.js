@@ -6,6 +6,8 @@ export const errorHandler = (err, req, res, next) => {
   }
 
   if (err.code === 11000) {
+    console.error(err)
+
     return res.status(409).json({
       message: 'A resource with that value already exists'
     });

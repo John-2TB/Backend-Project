@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const userSchema = new mongoose.Schema({
   registrationNumber: {
     type: String,
-    unique: true,
+
     trim: true,
     required: function () {
       return this.role === 'student'
@@ -33,7 +33,6 @@ const userSchema = new mongoose.Schema({
   student: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Student',
-    unique: true,
     required: function () {
       return this.role === 'student'
     }
@@ -42,11 +41,41 @@ const userSchema = new mongoose.Schema({
   teacher: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Teacher',
-    unique: true,
     required: function () {
       return this.role === 'teacher'
     }
   },
 });
+
+
+userSchema.index(
+  { registrationNumber: 1 },
+  {
+    unique: true,
+    partialFilterExpression: {
+      registrationNumber: { $exists: true }
+    }
+  }
+);
+
+userSchema.index(
+  { student: 1 },
+  {
+    unique: true,
+    partialFilterExpression: {
+      student: { $type: 'objectId' }
+    }
+  }
+);
+
+userSchema.index(
+  { teacher: 1 },
+  {
+    unique: true,
+    partialFilterExpression: {
+      teacher: { $type: 'objectId' }
+    }
+  }
+);
 
 export const User = mongoose.model('User', userSchema);

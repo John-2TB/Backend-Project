@@ -44,6 +44,12 @@ export const createUser = async (userData) => {
     teacher
   });
 
-  return newUser;
+  return {
+    registrationNumber,
+    email,
+    role,
+    student,
+    teacher
+  };
 
-}
+};
