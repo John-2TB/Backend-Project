@@ -71,7 +71,6 @@ export const updateStudent = async (studentID, studentDetails) => {
   // Checks if subject IDs exist
   if(subjects !== undefined && subjects.length > 0) {
 
-
     const existingSubjects = await Subject.find({
       _id: { $in: subjects }
     })

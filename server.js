@@ -3,6 +3,8 @@ import express from 'express';
 import studentRoutes from './routes/studentRoutes.js';
 import classRoutes from './routes/classRoutes.js';
 import subjectRoutes from './routes/subjectRoutes.js';
+import userRoutes from './routes/userRoutes.js'
+import teacherRoutes from './routes/teacherRoutes.js'
 import { errorHandler } from './middleware/errorHandler.js';
 import { connectDB } from './config/db.js';
 
@@ -14,7 +16,9 @@ app.use(express.json());
 
 app.use('/students', studentRoutes);
 app.use('/classes', classRoutes);
-app.use('/subjects', subjectRoutes)
+app.use('/subjects', subjectRoutes);
+app.use('/user', userRoutes);
+app.use('/teachers', teacherRoutes)
 
 
 app.get('/', (req, res) => {

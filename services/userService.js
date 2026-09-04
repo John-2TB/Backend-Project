@@ -1,6 +1,8 @@
-import { User } from "../models/userModel";
-import { AppError } from "../errors/AppError";
-import { Student } from "../models/studentModel";
+import bcrypt from 'bcrypt';
+import { User } from "../models/userModel.js";
+import { Teacher } from '../models/teacherModel.js';
+import { AppError } from "../errors/AppError.js";
+import { Student } from "../models/studentModel.js";
 
 
 // Create user
@@ -31,7 +33,16 @@ export const createUser = async (userData) => {
     }
   }
 
-  const newUser = await User.create(userData);
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  const newUser = await User.create({
+    registrationNumber,
+    email,
+    password: hashedPassword,
+    role,
+    student,
+    teacher
+  });
 
   return newUser;
 
