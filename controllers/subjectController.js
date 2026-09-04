@@ -1,4 +1,4 @@
-import { createSubject, getstudentsBySubjectId } from "../services/subjectService.js";
+import { createSubject, getstudentsBySubjectId, deleteSubject } from "../services/subjectService.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
 // POST /subject
@@ -24,3 +24,16 @@ export const getStudentsBySubjectIdController = asyncHandler(
     })
   }
 );
+
+
+// Delete subjects by ID
+export const deleteSubjectController = asyncHandler(
+  async (req, res) => {
+    const deletedSubject = await deleteSubject(req.params.subjectId)
+
+    res.status(200).json({     
+      message: 'Subject was successfully deleted',
+      data: deletedSubject  
+    });
+  }
+)

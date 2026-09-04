@@ -36,3 +36,33 @@ export const getStudentByClass = async (classId) => {
 
   return students;
 };
+
+
+// DELETE class by class ID
+export const deleteClass = async (classId) => {
+  if (typeof classId !== 'string' ||
+    classId.trim() === '' ||
+    classId.length === 0 ||
+    !mongoose.isValidObjectId(classId)
+  ) {
+    throw new AppError('Invalid data type', 400);
+  }
+
+
+    // Checks if class IDs exist
+    const existingClass = await Class.findById(classId)
+  
+    if (!existingClass) {
+      throw new AppError('Class not found', 404);
+    }
+  
+  
+    await Student.updateMany(
+      { class: classId },
+      { $set: { class: null } }
+    );
+  
+    const deletedClass = await Class.findByIdAndDelete(classId);
+  
+    return deletedClass;
+}

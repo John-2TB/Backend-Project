@@ -1,4 +1,4 @@
-import { createClass, getStudentByClass } from "../services/classService.js";
+import { createClass, deleteClass, getStudentByClass } from "../services/classService.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
 
@@ -24,4 +24,17 @@ export const getStudentByClassController = asyncHandler(
       data: students
     })
   }
-)
+);
+
+
+// DELETE class by ID
+export const deleteClassController = asyncHandler(
+  async (req, res) => {
+    const deletedClass = await deleteClass(req.params.classId)
+
+    res.status(200).json({     
+      message: 'Class was successfully deleted',
+      data: deletedClass   
+    });
+  }
+);

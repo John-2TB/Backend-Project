@@ -58,6 +58,14 @@ export const validatesStudent = (options) => {
      });
     }
 
+    const uniqueSubjects = new Set(subjects);
+
+    if (uniqueSubjects.size !== subjects.length) {
+      return res.status(400).json({
+        message: 'Duplicate subjects are not allowed'
+      })
+    }
+
     // Checks value
     if (
       id <= 0 ||
@@ -101,26 +109,166 @@ export const validatesStudent = (options) => {
       })
     }
 
-    if (subjects !== undefined && subjects.some(subject => typeof subject !== 'string')) {
-      return res.status(400).json({
-        message: 'Invalid student subjects data'
-     });
-    }
-
     // Checks if class is a valid ObjectId
-    if (!mongoose.isValidObjectId(studentClass)) {
+    if (studentClass !== undefined && !mongoose.isValidObjectId(studentClass)) {
       return res.status(400).json({
         message: 'Invalid student class data'
       });
     }
 
-    if (!mongoose.isValidObjectId(subjects)) {
+    if (subjects !== undefined &&
+      subjects.some(subject => 
+        typeof subject !== 'string' ||
+        !mongoose.isValidObjectId(subject)
+      )
+    ) {
       return res.status(400).json({
         message: 'Invalid student subject data'
       });
     }
 
+    if (subjects !== undefined) {
+      const uniqueSubjects = new Set(subjects);
+
+      if (uniqueSubjects.size !== subjects.length) {
+        return res.status(400).json({
+          message: 'Duplicate subjects are not allowed'
+        })
+      }
+    }
   }
 
   next();
 }};
+
+
+// Validate user
+export const validateUser = () => {
+  return (req, res, next) => {
+
+
+    const {
+      registrationNumber,
+      email,
+      password,
+      role,
+      student,
+      teacher
+    } = req.body;
+
+
+    const validRoles = ['student', 'teacher', 'admin'];
+
+    if(!validRoles.includes(role)) {
+      return res.status(400).json({
+        message: 'Invalid role'
+        })
+    }
+
+    // Password is required
+    if(!password) {
+      return res.status(400).json({
+        message: 'Password is required'
+      })
+    }
+
+    // Checks type of data passed in
+    if (
+      (registrationNumber !== undefined && typeof registrationNumber !== 'string') ||
+      (typeof password !== 'string') ||
+      (email !== undefined && typeof email !== 'string') ||
+      (student !== undefined && !mongoose.isValidObjectId(student)) ||
+      (teacher !== undefined && !mongoose.isValidObjectId(teacher))
+    ) {
+      return res.status(400).json({
+        message: 'Invalid data type parsed in'
+      })
+    }
+
+
+    // STUDENT Rules
+    if (role === 'student') {
+      // Registration Number is required
+      if(!registrationNumber) {
+        return res.status(400).json({
+          message: 'Student requires a registration number'
+        })
+      }
+
+      // Student refrence is required
+      if(!student) {
+        return res.status(400).json({
+          message: 'Student requires a refrence ID'
+        })
+      }
+
+      if(teacher !== undefined) {
+        return res.status(400).json({
+          message: 'Student must not have a teacher refrence ID'
+        })
+      }
+    }
+
+
+    // TEACHERS
+    if (role === 'teacher') {
+      // Registration Number is not required
+      if(registrationNumber !== undefined) {
+        return res.status(400).json({
+          message: 'Teacher must not have a registration number'
+        })
+      }
+
+      if (!email) {
+        return res.status(400).json({
+          message: 'Teacher must have an email'
+        })
+      }
+
+      // Student refrence is not required
+      if(student !== undefined) {
+        return res.status(400).json({
+          message: 'Teacher must not have a student refrence ID'
+        })
+      }
+
+      if(!teacher) {
+        return res.status(400).json({
+          message: 'Teacher must have a teacher refrence ID'
+        })
+      }
+    }
+
+    // ADMIN Rules
+    if (role === 'admin') {
+      // Registration Number is not required
+      if(registrationNumber !== undefined) {
+        return res.status(400).json({
+          message: 'Admin must not have a registration number'
+        })
+      }
+
+      if (!email) {
+        return res.status(400).json({
+          message: 'Admin must have an email'
+        })
+      }
+
+      // Student refrence is not required
+      if(student !== undefined) {
+        return res.status(400).json({
+          message: 'Admin must not have a student refrence ID'
+        })
+      }
+
+      if(teacher !== undefined) {
+        return res.status(400).json({
+          message: 'Admin must not have a teacher refrence ID'
+        })
+      }
+    }
+
+
+    next();    
+  }
+};

@@ -1,5 +1,5 @@
 import express from 'express';
-import { createSubjectController, getStudentsBySubjectIdController } from "../controllers/subjectController.js";
+import { createSubjectController, deleteSubjectController, getStudentsBySubjectIdController } from "../controllers/subjectController.js";
 
 const router = express.Router();
 
@@ -12,5 +12,11 @@ router.post('/', createSubjectController);
 // GET
 // ====================================
 router.get('/:subjectId/students', getStudentsBySubjectIdController);
+
+
+// ====================================
+// DELETE
+// ====================================
+router.delete('/:subjectId', deleteSubjectController)
 
 export default router;
