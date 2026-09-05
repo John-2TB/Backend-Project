@@ -36,6 +36,8 @@ export const createUser = async (userData) => {
     }
   }
 
+  const mustChangePassword = role === 'student' || role === 'teacher';
+
   const hashedPassword = await bcrypt.hash(password, 10);
 
   await User.create({
@@ -44,7 +46,8 @@ export const createUser = async (userData) => {
     password: hashedPassword,
     role,
     student,
-    teacher
+    teacher,
+    mustChangePassword
   });
 
   return {
@@ -52,7 +55,8 @@ export const createUser = async (userData) => {
     email,
     role,
     student,
-    teacher
+    teacher,
+    mustChangePassword
   };
 
 };
@@ -100,7 +104,8 @@ export const loginUser = async (loginData) => {
     const token = jwt.sign(
       {
         userId: existingUser._id,
-        role: existingUser.role
+        role: existingUser.role,
+        mustChangePassword: existingUser.mustChangePassword
       },
       process.env.JWT_SECRET,
       {
@@ -111,6 +116,7 @@ export const loginUser = async (loginData) => {
     return {
       registrationNumber,
       role,
+      mustChangePassword: existingUser.mustChangePassword,
       token
     };
   }
@@ -135,7 +141,8 @@ export const loginUser = async (loginData) => {
     const token = jwt.sign(
       {
         userId: existingUser._id,
-        role: existingUser.role
+        role: existingUser.role,
+        mustChangePassword: existingUser.mustChangePassword
       },
       process.env.JWT_SECRET,
       {
@@ -146,8 +153,59 @@ export const loginUser = async (loginData) => {
     return {
       email,
       role,
+      mustChangePassword: existingUser.mustChangePassword,
       token
     };
   }
 
 };
+
+
+
+export const changePassword = async (userId, passwordData) => {
+  const {
+    currentPassword,
+    newPassword
+  } = passwordData
+
+  const existingUser = await User.findById(userId);
+
+  if (!existingUser) {
+    throw new AppError('User not found', 404)
+  };
+
+  if (
+    typeof currentPassword !== 'string' ||
+    currentPassword.trim().length === 0 ||
+    typeof newPassword !== 'string' ||
+    newPassword.trim().length === 0
+  ) {
+    throw new AppError('Invalid data type', 400);
+  }
+
+  const correctPassword = await bcrypt.compare(currentPassword, existingUser.password);
+
+  if (!correctPassword) {
+    throw new AppError('Incorrect password', 400);
+  }
+
+  if (newPassword.trim() === currentPassword.trim()) {
+    throw new AppError('Create a new password', 400);
+  }
+
+  if (newPassword.trim().length < 8) {
+    throw new AppError('Password is too short', 400);
+  }
+
+  const password = await bcrypt.hash(newPassword, 10);
+
+  existingUser.password = password;
+  existingUser.mustChangePassword = false;
+
+  await existingUser.save();
+
+  return {
+    message: 'Password changed successfully'
+  };
+  
+}

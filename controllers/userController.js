@@ -1,5 +1,5 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { createUser, loginUser } from "../services/userService.js";
+import { changePassword, createUser, loginUser } from "../services/userService.js";
 
 // Create new user
 export const createUserController = asyncHandler (
@@ -25,3 +25,12 @@ export const userLoginController = asyncHandler(
     })
   }
 );
+
+// Change password
+export const changePasswordController = asyncHandler(
+  async (req, res) => {
+    const changedPassword = await changePassword(req.user.userId, req.body);
+
+    res.status(200).json(changedPassword);
+  }
+)
