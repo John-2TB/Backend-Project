@@ -1,9 +1,11 @@
 import bcrypt from 'bcrypt';
+import mongoose from 'mongoose';
+import jwt from 'jsonwebtoken';
 import { User } from "../models/userModel.js";
 import { Teacher } from '../models/teacherModel.js';
 import { AppError } from "../errors/AppError.js";
 import { Student } from "../models/studentModel.js";
-import mongoose from 'mongoose';
+
 
 
 // Create user
@@ -95,9 +97,21 @@ export const loginUser = async (loginData) => {
       throw new AppError('Incorrect password', 400)
     }
 
+    const token = jwt.sign(
+      {
+        userId: existingUser._id,
+        role: existingUser.role
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: '1h'
+      }
+    );
+
     return {
       registrationNumber,
-      role
+      role,
+      token
     };
   }
 
@@ -118,9 +132,21 @@ export const loginUser = async (loginData) => {
       throw new AppError('Incorrect password', 400)
     }
 
+    const token = jwt.sign(
+      {
+        userId: existingUser._id,
+        role: existingUser.role
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: '1h'
+      }
+    );
+
     return {
       email,
-      role
+      role,
+      token
     };
   }
 

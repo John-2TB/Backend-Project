@@ -5,6 +5,7 @@ import {
   updateTeacherController,
   deleteTeacherController
 } from '../controllers/teacherController.js';
+import { authValidation, authorizeRoles } from '../middleware/authMiddleware.js';
 
 
 const router = express.Router();
@@ -12,25 +13,22 @@ const router = express.Router();
 // ====================================
 // POST
 // ====================================
-router.post('/', createTeacherController);
+router.post('/', authValidation(), authorizeRoles('admin'), createTeacherController);
 
 // ====================================
 // GET
 // ====================================
-router.get('/:teacherId', getTeacherController);
-router.get('/', getTeacherController);
+router.get('/:teacherId', authValidation(), authorizeRoles('admin'), getTeacherController);
+router.get('/', authValidation(), authorizeRoles('admin'), getTeacherController);
 
 // ====================================
 // PATCH
 // ====================================
-router.patch('/:teacherId', updateTeacherController);
+router.patch('/:teacherId', authValidation(), authorizeRoles('admin'), updateTeacherController);
 
 // ====================================
 // DELETE
 // ====================================
-router.delete('/:teacherId', deleteTeacherController);
-
-
-
+router.delete('/:teacherId', authValidation(), authorizeRoles('admin'), deleteTeacherController);
 
 export default router;
